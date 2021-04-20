@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh 'pip install -r requirements.txt'
+                }
+            }
+        stage('Python Lint') {
+            steps {
+                sh 'pylint-fail-under --fail_under 5.0 *.py'
+            }
+        }
+        stage('Test and Coverage') {
+            steps {
+                script {
+                    def files = findFiles(glob: '**/test*.py')
+                    for (file in files) {
+                        sh "coverage run --omit */dist-packages/*,*/site-packages/* ${file.path}"
+                    }
+                }
+            }
+            post {
+                always {
+                    script {
+                        def test_reports_exist = fileExists 'test-reports'
+                        if (test_reports_exist) {                        
+                            junit 'test-reports/*.xml'
+                        }
+                        def api_test_reports_exist = fileExists 'api-test-reports'
+                        if (api_test_reports_exist) {                        
+                            junit 'api-test-reports/*.xml'
+                        }
+                        sh 'coverage report'
+                        sh 'zip app.zip *.py'
+                        archiveArtifacts '**/app.zip'
+                    }
+                }
+            }
+        }
+    }
+}
