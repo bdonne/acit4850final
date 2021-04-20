@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     if (${params.RUN}) {                        
-                        ./deliver.sh
+                        sh './deliver.sh'
                     }
                 }
             }
