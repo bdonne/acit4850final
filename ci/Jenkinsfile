@@ -35,7 +35,7 @@ pipeline {
         stage('Run') {
             steps {
                 script {
-                    if (${params.RUN}) {                        
+                    if ("${params.RUN}") {                        
                         sh './deliver.sh'
                     }
                 }
