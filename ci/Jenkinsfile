@@ -33,12 +33,11 @@ pipeline {
             }
         }
         stage('Run') {
+            when {
+                expression { return params.RUN }
+            }
             steps {
-                script {
-                    if ("${params.RUN}") {                        
-                        sh './deliver.sh'
-                    }
-                }
+                sh './deliver.sh'
             }
         }
         stage('Build Results') {
