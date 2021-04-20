@@ -5,7 +5,7 @@
 pipeline {
     agent any
     parameters {
-        booleanParam(name: 'RUN', defaultValue: true, description: 'Whether to Run the Code')
+        booleanParam(name: 'RUN', defaultValue: false, description: 'Whether to Run the Code')
 
         string(name: 'BUILD_NAME', defaultValue: 'Latest', description: 'Name of the build')
     }
