@@ -43,7 +43,7 @@ pipeline {
         }
         stage('Build Results') {
             steps {
-                echo 'Build ${params.BUILD_NAME} completed successfully.'
+                echo "Build ${params.BUILD_NAME} completed successfully."
                 echo 'I have now completed ACIT 4850!'
                 echo 'Brian Donnelly (A00979287): Group 39'
             }
