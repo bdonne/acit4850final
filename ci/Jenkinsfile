@@ -1,41 +1,51 @@
+//Brian Donnelly
+//4/20/2021
+//Final Assignment Jenkinsfile
+
 pipeline {
     agent any
+    parameters {
+        booleanParam(name: 'RUN', defaultValue: false, description: 'Whether to Run the Code')
+
+        string(name: 'BUILD_NAME', defaultValue: 'Latest', description: 'Name of the build')
+    }
     stages {
         stage('Build') {
             steps {
-                sh 'pip install -r requirements.txt'
+                echo 'Starting Build...'
+                sh 'mvn -B -DskipTests clean install'
+                echo 'Build Complete.'
                 }
             }
-        stage('Python Lint') {
+        stage('Code Quantity') {
             steps {
-                sh 'pylint-fail-under --fail_under 5.0 *.py'
+                sh 'wc -l src/main/java/com/mycompany/app/App.java'
             }
         }
-        stage('Test and Coverage') {
+        stage('Test') {
             steps {
-                script {
-                    def files = findFiles(glob: '**/test*.py')
-                    for (file in files) {
-                        sh "coverage run --omit */dist-packages/*,*/site-packages/* ${file.path}"
-                    }
-                }
+                sh 'mvn test'
             }
             post {
                 always {
-                    script {
-                        def test_reports_exist = fileExists 'test-reports'
-                        if (test_reports_exist) {                        
-                            junit 'test-reports/*.xml'
-                        }
-                        def api_test_reports_exist = fileExists 'api-test-reports'
-                        if (api_test_reports_exist) {                        
-                            junit 'api-test-reports/*.xml'
-                        }
-                        sh 'coverage report'
-                        sh 'zip app.zip *.py'
-                        archiveArtifacts '**/app.zip'
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('Run') {
+            steps {
+                script {
+                    if (${params.RUN}) {                        
+                        ./deliver.sh
                     }
                 }
+            }
+        }
+        stage('Build Results') {
+            steps {
+                echo 'Build ${params.BUILD_NAME} completed successfully.'
+                echo 'I have now completed ACIT 4850!'
+                echo 'Brian Donnelly (A00979287): Group 39'
             }
         }
     }
